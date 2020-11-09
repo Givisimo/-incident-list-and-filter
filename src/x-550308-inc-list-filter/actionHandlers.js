@@ -68,7 +68,7 @@ export const actionHandlers = {
           .includes(input.toLowerCase());
       }
     });
-    console.log('res', filterResult);
+
     if (filterResult.length === 0) {
       dispatch(FILTER_NO_DATA);
     }
