@@ -1,0 +1,19 @@
+@import '@servicenow/sass-kit/host';
+
+.container {
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.list-item {
+  flex-basis: 48%;
+  margin: 0.5%;
+}
+
+.no-data {
+  text-align: center;
+}
