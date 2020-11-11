@@ -11,9 +11,10 @@ createCustomElement('filter-component', {
   actionHandlers: actionHandlers,
   properties: {
     statesIncidentSet: { default: '' },
-    input: { default: ' ' },
+    input: { default: '' },
     radioBtnValue: { default: 'All' },
     showList: { default: true },
     filtered: { default: [] },
+    incidents: { default: [] },
   },
 });

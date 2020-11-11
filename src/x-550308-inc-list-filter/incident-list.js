@@ -9,15 +9,15 @@ createCustomElement('x-550308-inc-list-filter', {
   view,
   styles,
   initialState: {
+    showList: true,
     incidents: [],
     clicked: '',
     filtered: [],
     incidentItem: '',
     modalOpen: false,
     statesIncidentSet: '',
-    input: ' ',
+    input: '',
     radioBtnValue: 'All',
-    showList: true,
   },
   actionHandlers: actionHandlers,
 });

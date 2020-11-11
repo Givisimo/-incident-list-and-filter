@@ -1,34 +1,49 @@
 import { actionTypes } from '@servicenow/ui-core';
 import {
-  INCIDENT_FETCH_SUCCESS,
-  FETCH_LATEST_INCIDENT,
+  INCIDENT_FETCH_SUCCEEDED,
+  FETCH_LATEST_INCIDENT_STARTED,
   DROPDOWN_PANEL_ITEM_CLICKED,
   nowCardActionsId,
-  OPEN_INCIDENT_CARD,
-  DELETE_INCIDENT,
-  CLOSE_INCIDENT_CARD,
-  INCIDENT_DELETE_SUCCESS,
+  INCIDENT_CARD_OPENED,
+  INCIDENT_DELETE_STARTED,
+  INCIDENT_CARD_CLOSED,
+  INCIDENT_DELETE_SUCCEEDED,
   MODAL_DISMISSED,
-  FILTER_INCIDENTS,
-  FILTER_NO_DATA,
+  INCIDENTS_FILTER_STARTED,
+  INCIDENTS_FILTER_FAILED,
+  FILTER_SUCCEEDED,
+  INCIDENT_CARD_SELECTED,
 } from './constants';
 import { deleteIncident, getIncidents } from './httpEffects';
 const { COMPONENT_BOOTSTRAPPED } = actionTypes;
 
 export const actionHandlers = {
-  [COMPONENT_BOOTSTRAPPED]: ({ dispatch }) => dispatch(FETCH_LATEST_INCIDENT),
+  [COMPONENT_BOOTSTRAPPED]: ({ dispatch }) =>
+    dispatch(FETCH_LATEST_INCIDENT_STARTED),
 
-  [FETCH_LATEST_INCIDENT]: getIncidents,
+  [FETCH_LATEST_INCIDENT_STARTED]: getIncidents,
 
-  [INCIDENT_FETCH_SUCCESS]: ({ action, updateState, state }) => {
+  [FILTER_SUCCEEDED]: ({ dispatch, action, updateState }) => {
+    const { input, radioBtnValue } = action.payload;
+
+    updateState({
+      input,
+      radioBtnValue,
+    });
+    dispatch(INCIDENTS_FILTER_STARTED);
+  },
+
+  [INCIDENT_FETCH_SUCCEEDED]: ({ action, updateState, state, dispatch }) => {
     const { result } = action.payload;
 
     if (!state.getStatesIncidentSet) {
       const stateSet = new Set();
+      stateSet.add('All');
       result.forEach(item => stateSet.add(item.state));
       updateState({ statesIncidentSet: stateSet });
     }
-    updateState({ incidents: result });
+    updateState({ incidents: result, filtered: result });
+    dispatch(INCIDENTS_FILTER_STARTED);
   },
 
   [DROPDOWN_PANEL_ITEM_CLICKED]: ({ action, state, dispatch, updateState }) => {
@@ -38,43 +53,63 @@ export const actionHandlers = {
       incidentItem: incidents.find(({ sys_id }) => sys_id === clicked),
     });
     payload.item.id === nowCardActionsId.open
-      ? dispatch(OPEN_INCIDENT_CARD)
-      : dispatch(DELETE_INCIDENT, { sys_id: clicked });
+      ? dispatch(INCIDENT_CARD_OPENED)
+      : dispatch(INCIDENT_DELETE_STARTED, { sys_id: clicked });
   },
 
-  [OPEN_INCIDENT_CARD]: ({ updateState }) => updateState({ modalOpen: true }),
+  [INCIDENT_CARD_SELECTED]: ({ dispatch, action, updateState, state }) => {
+    const { incidents } = state;
+    const { payload } = action;
 
-  [MODAL_DISMISSED]: ({ dispatch }) => dispatch(CLOSE_INCIDENT_CARD),
-
-  [CLOSE_INCIDENT_CARD]: ({ updateState }) => updateState({ modalOpen: false }),
-
-  [DELETE_INCIDENT]: deleteIncident,
-
-  [INCIDENT_DELETE_SUCCESS]: ({ dispatch }) => dispatch(FETCH_LATEST_INCIDENT),
-
-  [FILTER_INCIDENTS]: ({ state, action, updateState, dispatch }) => {
-    const { input, radioBtnValue } = action.payload;
-
-    let filterResult = state.incidents.filter(item => {
-      if (radioBtnValue === 'All') {
-        return item.short_description
-          .toLowerCase()
-          .includes(input.toLowerCase());
-      }
-
-      if (item.state === radioBtnValue) {
-        return item.short_description
-          .toLowerCase()
-          .includes(input.toLowerCase());
-      }
+    updateState({
+      clicked: payload.sys_id,
+      incidentItem: incidents.find(({ sys_id }) => sys_id === payload.sys_id),
     });
+    if (action.meta.event.target !== action.meta.event.currentTarget) {
+      return;
+    }
+    dispatch(INCIDENT_CARD_OPENED);
+  },
+
+  [INCIDENT_CARD_OPENED]: ({ updateState }) => {
+    updateState({ modalOpen: true });
+  },
+
+  [MODAL_DISMISSED]: ({ dispatch }) => dispatch(INCIDENT_CARD_CLOSED),
+
+  [INCIDENT_CARD_CLOSED]: ({ updateState }) =>
+    updateState({ modalOpen: false }),
+
+  [INCIDENT_DELETE_STARTED]: deleteIncident,
+
+  [INCIDENT_DELETE_SUCCEEDED]: ({ updateState, dispatch }) => {
+    updateState({ input: '' });
+    dispatch(FETCH_LATEST_INCIDENT_STARTED);
+  },
+
+  [INCIDENTS_FILTER_STARTED]: ({ state, updateState, dispatch }) => {
+    const { input, radioBtnValue } = state;
+
+    let filterResult = state.incidents.filter(
+      ({ short_description, state: itemState }) => {
+        if (radioBtnValue === 'All') {
+          return short_description.toLowerCase().includes(input.toLowerCase());
+        }
+
+        if (itemState === radioBtnValue) {
+          return short_description.toLowerCase().includes(input.toLowerCase());
+        }
+      },
+    );
 
     if (filterResult.length === 0) {
-      dispatch(FILTER_NO_DATA);
+      dispatch(INCIDENTS_FILTER_FAILED);
     }
 
     updateState({ filtered: filterResult });
   },
 
-  [FILTER_NO_DATA]: ({ updateState }) => updateState({ showList: false }),
+  [INCIDENTS_FILTER_FAILED]: ({ updateState }) => {
+    updateState({ showList: false });
+  },
 };

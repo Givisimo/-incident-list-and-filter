@@ -3,40 +3,40 @@
     "x-550308-inc-list-filter": {
       "actions": [
         {
-          "name": "FETCH_LATEST_INCIDENT",
+          "name": "FETCH_LATEST_INCIDENT_STARTED",
           "description": "Fetch data from API"
         },
         {
-          "name": "INCIDENT_FETCH_SUCCESS",
+          "name": "INCIDENT_FETCH_SUCCEEDED",
           "description": "updates state with data from API"
         },
         {
           "name": "DROPDOWN_PANEL_ITEM_CLICKED",
-          "description": "set the value of state.clicked with sys_id of clicked by user card incident"
+          "description": "set the value of state.clicked with sys_id of clicked by user card incident and dispatches one of two actions according to clicked field in dropdown menu - INCIDENT_CARD_OPENED or DELETE_INCIDENT"
         },
         {
-          "name": "DROPDOWN_PANEL_ITEM_CLICKED",
-          "description": "set the value of state.clicked with sys_id of clicked by user card incident and dispatches one of two actions according to clicked field in dropdown menu - OPEN_INCIDENT_CARD or DELETE_INCIDENT"
+          "name": "INCIDENT_CARD_SELECTED",
+          "description": "update state of clicked key with sys_id from payload and find clicked incident in incidents array. Then dispatch INCIDENT_CARD_OPENED"
         },
         {
-          "name": "OPEN_INCIDENT_CARD",
+          "name": "INCIDENT_CARD_OPENED",
           "description": " sets state.modalOpen to true"
         },
         {
           "name": "MODAL_DISMISSED",
-          "description": "dispatches CLOSE_INCIDENT_CARD"
+          "description": "dispatches INCIDENT_CARD_CLOSED"
         },
         {
-          "name": "CLOSE_INCIDENT_CARD",
+          "name": "INCIDENT_CARD_CLOSED",
           "description": " sets state.modalOpen to false"
         },
         {
-          "name": "DELETE_INCIDENT",
-          "description": "delete incident from API by sys_id and dispatches INCIDENT_DELETE_SUCCESS"
+          "name": "INCIDENT_DELETE_STARTED",
+          "description": "delete incident from API by sys_id and dispatches INCIDENT_DELETE_SUCCEEDED"
         },
         {
-          "name": "INCIDENT_DELETE_SUCCESS",
-          "description": "dispatches FETCH_LATEST_INCIDENT"
+          "name": "INCIDENT_DELETE_SUCCEEDED",
+          "description": "dispatches FETCH_LATEST_INCIDENT_STARTED"
         },
         {
           "name": "MODAL_DELETE_BUTTON_CLICKED",
@@ -51,11 +51,19 @@
           "description": "sets the value of input and dispatches FILTER_START"
         },
         {
-          "name": "FILTER_START",
-          "description": "dispatches FILTER_INCIDENTS with values"
+          "name": "FILTER_STARTED",
+          "description": "dispatches FILTER_SUCCEEDED with values from input and radioBtn"
         },
         {
-          "name": "FILTER_NO_DATA",
+          "name": "FILTER_SUCCEEDED",
+          "description": "update state of main component with values from payload and dispatch INCIDENTS_FILTER_STARTED"
+        },
+        {
+          "name": "INCIDENTS_FILTER_STARTED",
+          "description": "filter incidents array by radioBtnValue and by input value. In case filteredArr.length is null, dispatch INCIDENTS_FILTER_FAILED"
+        },
+        {
+          "name": "INCIDENTS_FILTER_FAILED",
           "description": "sets showList to false"
         }
       ],

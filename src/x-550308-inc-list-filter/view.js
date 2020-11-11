@@ -1,6 +1,7 @@
 import '@servicenow/now-template-card';
 import '../custom-modal';
 import '../filter';
+import { INCIDENT_CARD_SELECTED } from './constants';
 
 export default (
   {
@@ -10,12 +11,14 @@ export default (
     filtered,
     statesIncidentSet,
     input,
-    radioBtnValue,
     showList,
+    radioBtnValue,
   },
-  { updateState },
+  { dispatch, updateState },
 ) => {
-  let resultArr = filtered.length > 0 ? filtered : incidents;
+  if (filtered.length > 0) {
+    updateState({ showList: true });
+  }
 
   return (
     <div>
@@ -24,7 +27,6 @@ export default (
           modalOpen={modalOpen}
           incidentItem={incidentItem}
           input={input}
-          radioBtnValue={radioBtnValue}
         />
       ) : null}
 
@@ -32,15 +34,16 @@ export default (
         <filter-component
           statesIncidentSet={statesIncidentSet}
           input={input}
-          radioBtnValue={radioBtnValue}
           showList={showList}
           filtered={filtered}
+          incidents={incidents}
+          radioBtnValue={radioBtnValue}
         />
       )}
 
       {showList ? (
         <ul className="container">
-          {resultArr.map(item => {
+          {filtered.map(item => {
             const {
               sys_id,
               short_description,
@@ -87,7 +90,7 @@ export default (
                   contentItemMinWidth="300"
                   footerContent={{ label: 'Updated', value: updated_on }}
                   configAria={{}}
-                  on-click={() => updateState({ clicked: sys_id })}
+                  on-click={() => dispatch(INCIDENT_CARD_SELECTED, { sys_id })}
                 />
               </li>
             );

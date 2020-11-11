@@ -2,21 +2,21 @@ import '@servicenow/now-input';
 import '@servicenow/now-radio-buttons';
 
 export default ({ input, properties }) => {
-  const { statesIncidentSet } = properties;
+  const { statesIncidentSet, radioBtnValue } = properties;
+
   let optionsArr = [];
+
   statesIncidentSet.forEach(i => optionsArr.push(i));
-  const optionsObjArr = optionsArr.map(item => {
+  const optionsResult = optionsArr.map(item => {
     let obj = {};
     obj.id = item;
     obj.label = item;
+
+    if (obj.label === radioBtnValue) {
+      obj.checked = true;
+    }
     return obj;
   });
-  let defaultOption = {
-    id: 'All',
-    label: 'All',
-    checked: true,
-  };
-  let optionsResult = [defaultOption, ...optionsObjArr];
 
   return (
     <div className="input-container">
