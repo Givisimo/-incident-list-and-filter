@@ -82,10 +82,8 @@ export const actionHandlers = {
 
   [INCIDENT_DELETE_STARTED]: deleteIncident,
 
-  [INCIDENT_DELETE_SUCCEEDED]: ({ updateState, dispatch }) => {
-    updateState({ input: '' });
-    dispatch(FETCH_LATEST_INCIDENT_STARTED);
-  },
+  [INCIDENT_DELETE_SUCCEEDED]: ({ dispatch }) =>
+    dispatch(FETCH_LATEST_INCIDENT_STARTED),
 
   [INCIDENTS_FILTER_STARTED]: ({ state, updateState, dispatch }) => {
     const { input, radioBtnValue } = state;
