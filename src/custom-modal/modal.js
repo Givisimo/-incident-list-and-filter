@@ -10,7 +10,8 @@ createCustomElement('custom-modal', {
   styles,
   actionHandlers: actionHandlers,
   properties: {
-    modalOpen: { default: '' },
+    modalOpen: { default: false },
     incidentItem: { default: '' },
+    input: { default: '' },
   },
 });

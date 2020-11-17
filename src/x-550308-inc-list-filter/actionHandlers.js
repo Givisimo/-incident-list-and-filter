@@ -86,9 +86,9 @@ export const actionHandlers = {
     dispatch(FETCH_LATEST_INCIDENT_STARTED),
 
   [INCIDENTS_FILTER_STARTED]: ({ state, updateState, dispatch }) => {
-    const { input, radioBtnValue } = state;
+    const { input, radioBtnValue, incidents } = state;
 
-    let filterResult = state.incidents.filter(
+    let filterResult = incidents.filter(
       ({ short_description, state: itemState }) => {
         if (radioBtnValue === 'All') {
           return short_description.toLowerCase().includes(input.toLowerCase());
